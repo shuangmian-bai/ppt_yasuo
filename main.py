@@ -1,19 +1,37 @@
-from ppt_optimizer import convert_emf_to_png_in_pptx, ProcessStatus
+from pprint import pprint
+
+from ppt_optimizer import query_methods, call_module
+import json
 
 if __name__ == "__main__":
-    INPUT = "./data/电力电子技术冲刺版课件7.pptx"
-    OUTPUT = "./outdata/电力电子技术冲刺版课件7.pptx"
-    MAX_WORKERS = 4
+    # 1. 查询所有可用方法
+    print("=== 可用的处理方法 ===")
+    methods = query_methods()
+    pprint(methods)
+
+    # 2. 调用模块示例
+    print("\n=== 调用模块处理PPT ===")
     
-    print(f"开始处理，使用 {MAX_WORKERS} 个线程...")
-    status, result = convert_emf_to_png_in_pptx(INPUT, OUTPUT, max_workers=MAX_WORKERS)
+    # 构造调用参数
+    call_params = {
+        "function": "convert_emf_to_png_in_pptx",
+        "input_pptx": "./data/电力电子技术冲刺版课件7.pptx",
+        "output_pptx": "./outdata/电力电子技术冲刺版课件7.pptx",
+        "max_workers": 4
+    }
     
-    if status == ProcessStatus.SUCCESS:
-        print("\n处理完成")
-        print(f"输入文件: {INPUT}")
-        print(f"输出文件: {OUTPUT}")
-        print(f"替换矢量图数量: {result}")
-    elif status == ProcessStatus.FILE_NOT_FOUND:
-        print(f"\n错误: {result}")
-    elif status == ProcessStatus.ERROR_INTERRUPTED:
-        print(f"\n处理中断: {result}")
+    # 转换为JSON字符串
+    params_json = json.dumps(call_params)
+    
+    # 调用模块
+    success, result = call_module("vector_image", params_json)
+    
+    if success:
+        status, data = result
+        print(f"\n处理状态: {status.value}")
+        if status.name == "SUCCESS":
+            print(f"替换矢量图数量: {data}")
+        else:
+            print(f"错误信息: {data}")
+    else:
+        print(f"\n调用失败: {result}")
