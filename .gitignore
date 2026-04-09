@@ -1,3 +1,6 @@
 /data/
 /outdata/
 /input/
+/dist/
+/build/
+/main.spec
