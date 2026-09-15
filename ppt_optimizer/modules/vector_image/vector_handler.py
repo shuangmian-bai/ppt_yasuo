@@ -21,9 +21,13 @@ def process_slide(slide, slide_idx, max_pixel=1920, quality=90):
     
     for shape in reversed(shapes):
         if shape.shape_type == 13:  # 图片
-            img = shape.image
-            ext = img.ext.lower()
-            
+            try:
+                img = shape.image
+                ext = img.ext.lower()
+            except Exception:
+                # 无法读取的图片格式（如 webp/mpo 等 python-pptx 不支持的格式）直接跳过
+                continue
+
             if ext in ["emf", "wmf", "svg"]:
                 try:
                     # 提取图片字节
